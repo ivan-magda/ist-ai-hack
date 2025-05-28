@@ -4,12 +4,29 @@ import Observation
 @Observable
 class ChatViewModel {
     var messages: [ChatMessage] = []
-    var speechService = SpeechService()
     var currentTranscription = ""
     var isShowingLiveTranscription = false
+    var apiKeyValidationError: String?
+
+    var speechService = SpeechService()
+    var openAIService = OpenAIService()
 
     init() {
         observeSpeechService()
+        validateAPIKey()
+    }
+
+    private func validateAPIKey() {
+        Task {
+            let isValid = await openAIService.validateAPIKey()
+            await MainActor.run {
+                if !isValid {
+                    apiKeyValidationError = "OpenAI API key is invalid or not configured. Please check your API key."
+                } else {
+                    apiKeyValidationError = nil
+                }
+            }
+        }
     }
 
     func startRecording() {
@@ -26,11 +43,22 @@ class ChatViewModel {
     private func addUserMessage(_ text: String) {
         let message = ChatMessage(text: text, isUser: true)
         messages.append(message)
+
+        generateAIResponse(for: text)
     }
 
     func addAIMessage(_ text: String) {
         let message = ChatMessage(text: text, isUser: false)
         messages.append(message)
+    }
+
+    private func generateAIResponse(for userInput: String) {
+        Task {
+            let response = await openAIService.generateResponse(from: userInput)
+            await MainActor.run {
+                addAIMessage(response)
+            }
+        }
     }
 }
 

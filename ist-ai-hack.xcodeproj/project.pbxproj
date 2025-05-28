@@ -6,10 +6,6 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		2C7D94382DE702E50065124A /* OpenAI in Frameworks */ = {isa = PBXBuildFile; productRef = 2C7D94372DE702E50065124A /* OpenAI */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXContainerItemProxy section */
 		2C7D94032DE700010065124A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -56,7 +52,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2C7D94382DE702E50065124A /* OpenAI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -117,7 +112,6 @@
 			);
 			name = "ist-ai-hack";
 			packageProductDependencies = (
-				2C7D94372DE702E50065124A /* OpenAI */,
 			);
 			productName = "ist-ai-hack";
 			productReference = 2C7D93F52DE6FFFF0065124A /* ist-ai-hack.app */;
@@ -202,7 +196,6 @@
 			mainGroup = 2C7D93EC2DE6FFFF0065124A;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				2C7D94362DE702E50065124A /* XCRemoteSwiftPackageReference "OpenAI" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 2C7D93F62DE6FFFF0065124A /* Products */;
@@ -571,25 +564,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		2C7D94362DE702E50065124A /* XCRemoteSwiftPackageReference "OpenAI" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/MacPaw/OpenAI.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.4.3;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		2C7D94372DE702E50065124A /* OpenAI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2C7D94362DE702E50065124A /* XCRemoteSwiftPackageReference "OpenAI" */;
-			productName = OpenAI;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 2C7D93ED2DE6FFFF0065124A /* Project object */;
 }
