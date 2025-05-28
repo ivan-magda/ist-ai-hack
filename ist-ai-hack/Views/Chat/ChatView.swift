@@ -78,7 +78,9 @@ struct ChatView: View {
 
                 SpeechInputButton(
                     isRecording: viewModel.speechService.isRecording,
-                    recognitionState: viewModel.speechService.recognitionState
+                    recognitionState: viewModel.speechService.recognitionState,
+                    remainingTime: viewModel.speechService.remainingTime,
+                    isAutoStopCountdown: viewModel.speechService.isAutoStopCountdown
                 ) {
                     if viewModel.speechService.isRecording {
                         viewModel.stopRecording()

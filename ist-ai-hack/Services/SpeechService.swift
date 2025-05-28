@@ -17,10 +17,22 @@ class SpeechService: NSObject {
     var recognitionState: SpeechRecognitionState = .idle
     var errorMessage: String?
 
+    // Auto-stop properties
+    var autoStopEnabled = true
+    var autoStopThreshold: TimeInterval = 3.0
+    var remainingTime: TimeInterval = 0
+    var isAutoStopCountdown = false
+
     private var speechRecognizer: SFSpeechRecognizer?
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?
     private var audioEngine = AVAudioEngine()
+
+    // Auto-stop implementation
+    private var silenceTimer: Timer?
+    private var lastTranscriptionUpdate = Date()
+    private var previousTranscriptionText = ""
+    private var maxRecordingDuration: TimeInterval = 60.0
 
     override init() {
         super.init()
@@ -93,7 +105,15 @@ class SpeechService: NSObject {
                 guard let self = self else { return }
 
                 if let result = result {
-                    self.transcribedText = result.bestTranscription.formattedString
+                    let newText = result.bestTranscription.formattedString
+
+                    // Check if transcription has meaningfully changed
+                    if self.hasTranscriptionChanged(newText) {
+                        self.resetAutoStopTimer()
+                        self.previousTranscriptionText = newText
+                    }
+
+                    self.transcribedText = newText
 
                     if result.isFinal {
                         self.stopRecording()
@@ -153,11 +173,17 @@ class SpeechService: NSObject {
             self.recognitionState = .recording
             self.transcribedText = ""
             self.errorMessage = nil
+            self.previousTranscriptionText = ""
+            self.lastTranscriptionUpdate = Date()
+            self.startAutoStopTimer()
         }
     }
 
     func stopRecording() {
         guard isRecording else { return }
+
+        // Stop auto-stop timer
+        stopAutoStopTimer()
 
         // Clean up audio resources
         if audioEngine.isRunning {
@@ -183,6 +209,7 @@ class SpeechService: NSObject {
     }
 
     private func cancelRecognition() {
+        stopAutoStopTimer()
         recognitionTask?.cancel()
         recognitionTask = nil
         recognitionRequest = nil
@@ -197,6 +224,7 @@ class SpeechService: NSObject {
 
     private func cleanupRecognition() {
         // Clean up without canceling (which triggers error callback)
+        stopAutoStopTimer()
         if audioEngine.isRunning {
             audioEngine.stop()
             audioEngine.inputNode.removeTap(onBus: 0)
@@ -225,6 +253,87 @@ class SpeechService: NSObject {
         if case .error = recognitionState {
             recognitionState = .idle
             errorMessage = nil
+        }
+    }
+
+    // MARK: - Auto-Stop Implementation
+
+    private func startAutoStopTimer() {
+        guard autoStopEnabled else { return }
+
+        stopAutoStopTimer() // Clean up any existing timer
+        remainingTime = autoStopThreshold
+        isAutoStopCountdown = false
+
+        silenceTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                guard let self = self, self.isRecording else { return }
+
+                let timeSinceLastUpdate = Date().timeIntervalSince(self.lastTranscriptionUpdate)
+                self.remainingTime = max(0, self.autoStopThreshold - timeSinceLastUpdate)
+
+                // Start countdown when less than 1 second remaining
+                if self.remainingTime <= 1.0 && !self.isAutoStopCountdown {
+                    self.isAutoStopCountdown = true
+                }
+
+                // Auto-stop when time runs out
+                if timeSinceLastUpdate >= self.autoStopThreshold {
+                    self.stopRecording()
+                }
+
+                // Maximum recording duration safety check
+                if Date().timeIntervalSince(self.lastTranscriptionUpdate) > self.maxRecordingDuration {
+                    self.stopRecording()
+                }
+            }
+        }
+    }
+
+    private func stopAutoStopTimer() {
+        silenceTimer?.invalidate()
+        silenceTimer = nil
+        remainingTime = 0
+        isAutoStopCountdown = false
+    }
+
+    private func resetAutoStopTimer() {
+        guard autoStopEnabled, isRecording else { return }
+        lastTranscriptionUpdate = Date()
+        remainingTime = autoStopThreshold
+        isAutoStopCountdown = false
+    }
+
+    private func hasTranscriptionChanged(_ newText: String) -> Bool {
+        let normalizedNew = newText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let normalizedPrevious = previousTranscriptionText.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        // Check for meaningful changes
+        if normalizedNew.count > normalizedPrevious.count {
+            return true
+        }
+
+        // Check for different content (not just formatting)
+        if normalizedNew != normalizedPrevious && !normalizedNew.isEmpty {
+            return true
+        }
+
+        return false
+    }
+
+    func setAutoStopEnabled(_ enabled: Bool) {
+        autoStopEnabled = enabled
+        if !enabled {
+            stopAutoStopTimer()
+        } else if isRecording {
+            startAutoStopTimer()
+        }
+    }
+
+    func setAutoStopThreshold(_ threshold: TimeInterval) {
+        autoStopThreshold = max(0.5, min(10.0, threshold)) // Clamp between 0.5 and 10 seconds
+        if isRecording {
+            resetAutoStopTimer()
         }
     }
 }

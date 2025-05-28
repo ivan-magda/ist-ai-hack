@@ -3,6 +3,8 @@ import SwiftUI
 struct SpeechInputButton: View {
     let isRecording: Bool
     let recognitionState: SpeechRecognitionState
+    let remainingTime: TimeInterval
+    let isAutoStopCountdown: Bool
     let onTap: () -> Void
 
     @State private var recordingPulseScale: CGFloat = 1.0
@@ -19,6 +21,20 @@ struct SpeechInputButton: View {
                 action: onTap
             ) {
                 ZStack {
+                    // Countdown progress ring
+                    if isRecording && isAutoStopCountdown {
+                        Circle()
+                            .stroke(Color.red.opacity(0.3), lineWidth: 4)
+                            .frame(width: 85, height: 85)
+
+                        Circle()
+                            .trim(from: 0, to: min(remainingTime / 1.0, 1.0))
+                            .stroke(Color.red, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                            .frame(width: 85, height: 85)
+                            .rotationEffect(.degrees(-90))
+                            .animation(.linear(duration: 0.1), value: remainingTime)
+                    }
+
                     // Outer pulsing ring when recording
                     if isRecording {
                         Circle()
@@ -27,7 +43,7 @@ struct SpeechInputButton: View {
                             .scaleEffect(recordingPulseScale)
                             .opacity(recordingPulseOpacity)
                             .animation(
-                                .easeInOut(duration: 1.0)
+                                .easeInOut(duration: isAutoStopCountdown ? 0.3 : 1.0)
                                 .repeatForever(autoreverses: true),
                                 value: recordingPulseScale
                             )
@@ -88,6 +104,11 @@ struct SpeechInputButton: View {
             return .gray.opacity(0.5)
         }
 
+        // Show warning color during countdown
+        if isAutoStopCountdown && isRecording {
+            return remainingTime < 0.5 ? .red : .orange
+        }
+
         switch recognitionState {
         case .idle:
             return .blue
@@ -122,27 +143,44 @@ struct SpeechInputButton: View {
     VStack(spacing: 20) {
         SpeechInputButton(
             isRecording: false,
-            recognitionState: .idle
+            recognitionState: .idle,
+            remainingTime: 0,
+            isAutoStopCountdown: false
         ) {}
 
         SpeechInputButton(
             isRecording: true,
-            recognitionState: .recording
+            recognitionState: .recording,
+            remainingTime: 3.0,
+            isAutoStopCountdown: false
+        ) {}
+
+        SpeechInputButton(
+            isRecording: true,
+            recognitionState: .recording,
+            remainingTime: 0.8,
+            isAutoStopCountdown: true
         ) {}
 
         SpeechInputButton(
             isRecording: false,
-            recognitionState: .processing
+            recognitionState: .processing,
+            remainingTime: 0,
+            isAutoStopCountdown: false
         ) {}
 
         SpeechInputButton(
             isRecording: false,
-            recognitionState: .error("Test error")
+            recognitionState: .error("Test error"),
+            remainingTime: 0,
+            isAutoStopCountdown: false
         ) {}
 
         SpeechInputButton(
             isRecording: false,
-            recognitionState: .idle
+            recognitionState: .idle,
+            remainingTime: 0,
+            isAutoStopCountdown: false
         ) {}
             .disabled(true)
     }
