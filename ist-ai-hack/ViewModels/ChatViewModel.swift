@@ -10,6 +10,7 @@ class ChatViewModel {
 
     var speechService = SpeechService()
     var openAIService = OpenAIService()
+    var elevenLabsService = ElevenLabsService()
 
     init() {
         observeSpeechService()
@@ -64,6 +65,8 @@ class ChatViewModel {
                 }
                 addAIMessage(response)
             }
+            
+            _ = await elevenLabsService.synthesizeAndPlay(text: response)
         }
     }
 }
