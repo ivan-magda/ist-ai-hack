@@ -3,12 +3,20 @@ import SwiftUI
 struct LiveTranscriptionBubble: View {
     let text: String
 
+    @State private var waveformScale: CGFloat = 1.0
+
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
                 Image(systemName: "waveform")
                     .foregroundStyle(.blue)
                     .font(.caption)
+                    .scaleEffect(waveformScale)
+                    .animation(
+                        .easeInOut(duration: 0.8)
+                        .repeatForever(autoreverses: true),
+                        value: waveformScale
+                    )
 
                 Text("Speaking...")
                     .font(.caption)
@@ -34,6 +42,13 @@ struct LiveTranscriptionBubble: View {
         )
         .padding(.horizontal)
         .animation(.easeInOut(duration: 0.2), value: text)
+        .onAppear {
+            startAnimations()
+        }
+    }
+
+    private func startAnimations() {
+        waveformScale = 1.3
     }
 }
 
