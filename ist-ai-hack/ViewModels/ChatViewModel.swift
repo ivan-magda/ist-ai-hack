@@ -53,9 +53,15 @@ class ChatViewModel {
     }
 
     private func generateAIResponse(for userInput: String) {
+        let loadingMessage = ChatMessage(text: "Thinking", isUser: false, isLoading: true)
+        messages.append(loadingMessage)
+
         Task {
             let response = await openAIService.generateResponse(from: userInput)
             await MainActor.run {
+                if let loadingIndex = messages.firstIndex(where: { $0.id == loadingMessage.id }) {
+                    messages.remove(at: loadingIndex)
+                }
                 addAIMessage(response)
             }
         }

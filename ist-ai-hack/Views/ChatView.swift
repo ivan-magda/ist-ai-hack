@@ -47,6 +47,7 @@ struct ChatView: View {
                         viewModel.startRecording()
                     }
                 }
+                .padding()
             }
             .padding()
             .background(Material.bar)
