@@ -16,17 +16,39 @@ struct ChatView: View {
     }
 
     private var chatContent: some View {
-        ScrollView {
-            LazyVStack(alignment: .leading, spacing: 8) {
-                ForEach(viewModel.messages) { message in
-                    ChatBubble(message: message)
+        ScrollViewReader { proxy in
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 8) {
+                    ForEach(viewModel.messages) { message in
+                        ChatBubble(message: message)
+                            .id(message.id)
+                    }
+
+                    if viewModel.isShowingLiveTranscription {
+                        LiveTranscriptionBubble(text: viewModel.currentTranscription)
+                            .id("live-transcription")
+                    }
+                }
+                .padding(.horizontal)
+            }
+            .onChange(of: viewModel.messages.last) { oldMessage, newMessage in
+                guard let newMessage else {
+                    return
                 }
 
-                if viewModel.isShowingLiveTranscription {
-                    LiveTranscriptionBubble(text: viewModel.currentTranscription)
+                if oldMessage?.isLoading != newMessage.isLoading {
+                    withAnimation(.easeOut(duration: 0.3)) {
+                        proxy.scrollTo(newMessage.id, anchor: .bottom)
+                    }
                 }
             }
-            .padding(.horizontal)
+            .onChange(of: viewModel.isShowingLiveTranscription) { _, isShowing in
+                if isShowing {
+                    withAnimation(.easeOut(duration: 0.3)) {
+                        proxy.scrollTo("live-transcription", anchor: .bottom)
+                    }
+                }
+            }
         }
         .safeAreaInset(edge: .bottom, alignment: .center, spacing: 0) {
             VStack {
