@@ -1,0 +1,15 @@
+{
+  "originHash" : "50cb4971dfd8ebc0aec09fd00747d000e5104cab8fcef11263901e9729330c3d",
+  "pins" : [
+    {
+      "identity" : "swiftui-stagger-animation",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ivan-magda/swiftui-stagger-animation.git",
+      "state" : {
+        "revision" : "de17f05f43b51a7b8799f638536b365448a50f91",
+        "version" : "1.0.0"
+      }
+    }
+  ],
+  "version" : 3
+}

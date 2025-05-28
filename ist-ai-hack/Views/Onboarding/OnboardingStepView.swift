@@ -1,4 +1,5 @@
 import SwiftUI
+import Stagger
 
 struct OnboardingStepView: View {
     let step: OnboardingStep
@@ -20,15 +21,18 @@ struct OnboardingStepView: View {
                     value: animate
                 )
                 .padding()
+                .stagger(transition: .scale.combined(with: .opacity))
 
             Text(step.title)
                 .font(.title)
                 .bold()
+                .stagger()
 
             Text(step.description)
                 .multilineTextAlignment(.center)
                 .foregroundColor(.secondary)
                 .padding(.horizontal, 30)
+                .stagger()
 
             Spacer()
         }
@@ -39,6 +43,7 @@ struct OnboardingStepView: View {
         .onDisappear {
             animate = false
         }
+        .staggerContainer()
     }
 }
 

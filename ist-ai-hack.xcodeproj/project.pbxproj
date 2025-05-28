@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		2C7D945E2DE757F80065124A /* Stagger in Frameworks */ = {isa = PBXBuildFile; productRef = 2C7D945D2DE757F80065124A /* Stagger */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		2C7D94032DE700010065124A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2C7D945E2DE757F80065124A /* Stagger in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = "ist-ai-hack";
 			packageProductDependencies = (
+				2C7D945D2DE757F80065124A /* Stagger */,
 			);
 			productName = "ist-ai-hack";
 			productReference = 2C7D93F52DE6FFFF0065124A /* ist-ai-hack.app */;
@@ -196,6 +202,7 @@
 			mainGroup = 2C7D93EC2DE6FFFF0065124A;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				2C7D945C2DE757F80065124A /* XCRemoteSwiftPackageReference "swiftui-stagger-animation" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 2C7D93F62DE6FFFF0065124A /* Products */;
@@ -564,6 +571,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		2C7D945C2DE757F80065124A /* XCRemoteSwiftPackageReference "swiftui-stagger-animation" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ivan-magda/swiftui-stagger-animation.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		2C7D945D2DE757F80065124A /* Stagger */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2C7D945C2DE757F80065124A /* XCRemoteSwiftPackageReference "swiftui-stagger-animation" */;
+			productName = Stagger;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 2C7D93ED2DE6FFFF0065124A /* Project object */;
 }
