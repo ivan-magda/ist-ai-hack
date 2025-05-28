@@ -6,11 +6,19 @@ struct LanguageTutorApp: App {
 
     var body: some Scene {
         WindowGroup {
-            if didCompleteOnboarding {
-                ContentView()
-            } else {
+            if shouldShowOnboarding {
                 OnboardingView()
+            } else {
+                ContentView()
             }
         }
+    }
+
+    private var shouldShowOnboarding: Bool {
+        #if DEBUG
+        return true
+        #else
+        return !didCompleteOnboarding
+        #endif
     }
 }
