@@ -36,14 +36,14 @@ struct ChatView: View {
                         .font(.caption)
                         .padding(.horizontal)
                 }
-                
+
                 if let ttsError = viewModel.elevenLabsService.errorMessage {
                     Text(ttsError)
                         .foregroundColor(.red)
                         .font(.caption)
                         .padding(.horizontal)
                 }
-                
+
                 if viewModel.elevenLabsService.isPlaying {
                     HStack {
                         Image(systemName: "speaker.wave.2")
@@ -65,6 +65,10 @@ struct ChatView: View {
                     }
                 }
                 .padding()
+                .disabled(
+                    viewModel.elevenLabsService.isPlaying ||
+                    viewModel.messages.last?.isLoading == true
+                )
             }
             .padding()
             .background(Material.bar)

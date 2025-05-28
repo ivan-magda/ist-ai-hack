@@ -31,6 +31,10 @@ class ChatViewModel {
     }
 
     func startRecording() {
+        guard !elevenLabsService.isPlaying else {
+            return
+        }
+
         speechService.clearError()
         Task {
             await speechService.startRecording()
@@ -59,14 +63,13 @@ class ChatViewModel {
 
         Task {
             let response = await openAIService.generateResponse(from: userInput)
+            _ = await elevenLabsService.synthesizeAndPlay(text: response)
             await MainActor.run {
                 if let loadingIndex = messages.firstIndex(where: { $0.id == loadingMessage.id }) {
                     messages.remove(at: loadingIndex)
                 }
                 addAIMessage(response)
             }
-            
-            _ = await elevenLabsService.synthesizeAndPlay(text: response)
         }
     }
 }

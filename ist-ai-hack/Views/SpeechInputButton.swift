@@ -9,6 +9,8 @@ struct SpeechInputButton: View {
     @State private var recordingPulseOpacity: Double = 0.8
     @State private var iconScale: CGFloat = 1.0
 
+    @Environment(\.isEnabled) private var isEnabled
+
     var body: some View {
         HStack {
             Spacer()
@@ -82,20 +84,36 @@ struct SpeechInputButton: View {
     }
 
     private var microphoneButtonColor: Color {
+        if !isEnabled {
+            return .gray.opacity(0.5)
+        }
+
         switch recognitionState {
-        case .idle: .blue
-        case .recording: .red
-        case .processing: .orange
-        case .error: .gray
+        case .idle:
+            return .blue
+        case .recording:
+            return .red
+        case .processing:
+            return .orange
+        case .error:
+            return .gray
         }
     }
 
     private var microphoneIcon: String {
+        if !isEnabled {
+            return "speaker.wave.2"
+        }
+
         switch recognitionState {
-        case .idle: "mic.fill"
-        case .recording: "stop.fill"
-        case .processing: "ellipsis"
-        case .error: "mic.slash.fill"
+        case .idle:
+            return "mic.fill"
+        case .recording:
+            return "stop.fill"
+        case .processing:
+            return "ellipsis"
+        case .error:
+            return "mic.slash.fill"
         }
     }
 }
@@ -121,6 +139,12 @@ struct SpeechInputButton: View {
             isRecording: false,
             recognitionState: .error("Test error")
         ) {}
+
+        SpeechInputButton(
+            isRecording: false,
+            recognitionState: .idle
+        ) {}
+            .disabled(true)
     }
     .padding()
 }
